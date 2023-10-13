@@ -21,7 +21,6 @@ export const ContactItem = ({ contact }) => {
   const { id, name, number, isFavorite } = contact;
 
   const dispatch = useDispatch();
-  // const contacts = useSelector(store => store.contacts.contacts);
 
   const deleteContact = () => {
     dispatch(deleteContactAction(id));
