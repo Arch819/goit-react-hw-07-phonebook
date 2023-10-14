@@ -16,6 +16,9 @@ export const ChangeInput = styled('input')({
   backgroundColor: 'transparent',
   color: '#aeaeae',
   fontSize: '16px',
-
   outline: 'transparent',
+
+  '&:is(:hover,:focus)': {
+    borderBottom: '2px solid #aeaeae',
+  },
 });

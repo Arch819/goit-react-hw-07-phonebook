@@ -26,7 +26,7 @@ export const ButtonSubmit = styled('button')({
     transition: 'transform 0.3s, background 0.3s',
   },
 
-  '&:hover': {
+  '&:is(:hover,:focus)': {
     background: '#34974d',
   },
   '&:active': {
@@ -39,7 +39,7 @@ export const ButtonText = styled('span')({
   color: '#fff',
   fontWeight: '600',
 
-  'button:hover &': {
+  'button:is(:hover,:focus) &': {
     color: 'transparent',
   },
 });
@@ -60,7 +60,7 @@ export const ButtonIcon = styled('span')({
     stroke: '#fff',
   },
 
-  'button:hover &': {
+  'button:is(:hover,:focus) &': {
     width: '148px',
     transform: 'translateX(-4px)',
   },

@@ -7,7 +7,7 @@ import {
 } from 'api/contacts';
 
 export const getContactThunk = createAsyncThunk(
-  'contacts/getAllContacts',
+  'contacts/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
       return await fetchGetContacts();
