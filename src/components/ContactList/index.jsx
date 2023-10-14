@@ -1,44 +1,58 @@
-import PropTypes from 'prop-types';
 import { ContactItem } from 'components/ContactItem';
-import { ContactListStyled } from './ContactList.styled';
-import { useSelector } from 'react-redux';
+import { ContactListStyled, EmptyEl } from './ContactList.styled';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { getContactThunk } from 'store/contacts/contactsThunk';
+import {
+  selectContacts,
+  selectError,
+  selectFilteredContacts,
+  selectIsLoading,
+} from 'store/contacts/selector';
+import { Loader } from 'components/Loader';
+import { ErrorMessage } from 'components/ErrorMessage';
 
 function sortContactsList(contacts) {
   contacts.sort((a, b) => a.name.localeCompare(b.name));
 
-  const favorites = contacts.filter(contact => contact.isFavorite === true);
-  const nonFavorites = contacts.filter(contact => contact.isFavorite !== true);
-
+  const favorites = contacts.filter(contact => contact.favorite === true);
+  const nonFavorites = contacts.filter(contact => contact.favorite !== true);
   const sortedContacts = favorites.concat(nonFavorites);
 
   return sortedContacts;
 }
 
 export const ContactList = () => {
-  const contacts = useSelector(store => store.contacts.contacts);
-  const filter = useSelector(store => store.filter.filter);
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
+  const loader = useSelector(selectIsLoading);
+  const error = useSelector(selectError);
+  const filteredContacts = useSelector(selectFilteredContacts);
 
-  const getVisibleContacts = () => {
-    const normalizedFilter = filter.toLowerCase();
+  useEffect(() => {
+    dispatch(getContactThunk());
+  }, [dispatch]);
 
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(normalizedFilter)
+  if (loader) {
+    return <Loader />;
+  }
+  if (error) {
+    return <ErrorMessage error={error} />;
+  }
+  if (contacts) {
+    const contactList = sortContactsList(filteredContacts);
+    return (
+      <>
+        {contactList.length ? (
+          <ContactListStyled>
+            {contactList.map(contact => {
+              return <ContactItem key={contact.id} contact={contact} />;
+            })}
+          </ContactListStyled>
+        ) : (
+          <EmptyEl>Not found</EmptyEl>
+        )}
+      </>
     );
-  };
-
-  const visibleContacts = getVisibleContacts();
-  const contactList = sortContactsList(visibleContacts);
-
-  return (
-    <ContactListStyled>
-      {contactList.map(contact => {
-        return <ContactItem key={contact.id} contact={contact} />;
-      })}
-    </ContactListStyled>
-  );
-};
-
-ContactList.propTypes = {
-  contacts: PropTypes.array,
-  onDeleteContact: PropTypes.func,
+  }
 };

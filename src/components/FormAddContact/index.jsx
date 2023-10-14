@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { Formik, Field, ErrorMessage } from 'formik';
 import { object, string } from 'yup';
-import { addContactAction } from 'store/contacts/sliceContacts';
+// import { addContactAction } from 'store/contacts/sliceContacts';
 import { useDispatch, useSelector } from 'react-redux';
 import { Report } from 'notiflix';
 
@@ -13,6 +13,8 @@ import {
   FormStyled,
   InputBox,
 } from './FormaAddContact.styled';
+import { addContactThunk } from 'store/contacts/contactsThunk';
+// import { addApiContact, getContacts } from 'api/contacts';
 
 export const schema = object().shape({
   name: string()
@@ -22,7 +24,7 @@ export const schema = object().shape({
       'Invalid name format.'
     )
     .required('This field is required'),
-  number: string()
+  phone: string()
     .trim()
     .matches(
       /\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}/,
@@ -32,7 +34,7 @@ export const schema = object().shape({
 });
 const initialValues = {
   name: '',
-  number: '',
+  phone: '',
 };
 
 export const FormAddContact = () => {
@@ -40,21 +42,18 @@ export const FormAddContact = () => {
   const contacts = useSelector(store => store.contacts.contacts);
 
   const handleSubmit = (value, { resetForm }) => {
-    addContact(value);
-    resetForm();
-  };
-  const addContact = data => {
     const identicalContactName = contacts?.some(
-      ({ name }) => data.name === name
+      ({ name }) => value.name === name
     );
     if (identicalContactName) {
       return Report.warning(
         'WARNING',
-        `${data.name} is already in contacts`,
+        `${value.name} is already in contacts`,
         'ok'
       );
     }
-    dispatch(addContactAction(data));
+    dispatch(addContactThunk(value));
+    resetForm();
   };
 
   return (
@@ -81,7 +80,7 @@ export const FormAddContact = () => {
           <InputBox>
             <Field
               type="tel"
-              name="number"
+              name="phone"
               title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
               required
             />
@@ -107,6 +106,9 @@ export const FormAddContact = () => {
             </svg>
           </ButtonIcon>
         </ButtonSubmit>
+        {/* <button type="button" onClick={() => handleTest()}>
+          test
+        </button> */}
       </FormStyled>
     </Formik>
   );

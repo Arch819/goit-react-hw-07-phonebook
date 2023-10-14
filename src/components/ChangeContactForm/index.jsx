@@ -2,12 +2,13 @@ import { AiOutlineSave } from 'react-icons/ai';
 import { ContactChange } from 'components/ContactItem/ContactItem.styled';
 import { ChangeInput, InputBox } from './ChangeContactForm.styled';
 import { useDispatch, useSelector } from 'react-redux';
-import { changeContactAction } from 'store/contacts/sliceContacts';
 import { Report } from 'notiflix';
+import { changeContactThunk } from 'store/contacts/contactsThunk';
+import { selectContacts } from 'store/contacts/selector';
 
 export const ChangeName = ({ contact, onChangeContact }) => {
   const dispatch = useDispatch();
-  const contacts = useSelector(store => store.contacts.contacts);
+  const contacts = useSelector(selectContacts);
 
   const { id, name } = contact;
 
@@ -25,23 +26,24 @@ export const ChangeName = ({ contact, onChangeContact }) => {
           'ok'
         );
       }
-      dispatch(changeContactAction({ id, inputValue }));
+      dispatch(changeContactThunk({ id, inputValue }));
     }
     onChangeContact('name');
   };
+  const handleBlur = e => {
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      onChangeContact('name');
+    }
+  };
   return (
     <InputBox>
-      <form
-        onSubmit={e => handleChangeContact(e)}
-        onBlur={() => onChangeContact('name')}
-      >
+      <form onSubmit={e => handleChangeContact(e)} onBlur={e => handleBlur(e)}>
         <ContactChange type="submit">
           <AiOutlineSave />
         </ContactChange>
         <ChangeInput
           type="text"
           name="name"
-          id="name"
           defaultValue={name}
           autoFocus
           placeholder="name*"
@@ -56,28 +58,30 @@ export const ChangeName = ({ contact, onChangeContact }) => {
 export const ChangeNumber = ({ contact, onChangeContact }) => {
   const dispatch = useDispatch();
 
-  const { id, number } = contact;
+  const { id, phone } = contact;
 
   const handleChangeContact = e => {
     e.preventDefault();
-    const inputValue = { number: e.target.elements.number.value };
-    if (number !== inputValue.number) {
-      dispatch(changeContactAction({ id, inputValue }));
+    const inputValue = { phone: e.target.elements.phone.value };
+    if (phone !== inputValue.phone) {
+      dispatch(changeContactThunk({ id, inputValue }));
     }
-    onChangeContact('number');
+    onChangeContact('phone');
   };
+  const handleBlur = e => {
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      onChangeContact('phone');
+    }
+  };
+
   return (
     <InputBox>
-      <form
-        onSubmit={handleChangeContact}
-        onBlur={() => onChangeContact('number')}
-      >
+      <form onSubmit={handleChangeContact} onBlur={e => handleBlur(e)}>
         <ChangeInput
           type="tel"
-          name="number"
-          id="number"
-          defaultValue={number}
-          placeholder="number*"
+          name="phone"
+          defaultValue={phone}
+          placeholder="phone number*"
           autoFocus
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required
